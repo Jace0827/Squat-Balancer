@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2GRASS</title>
+
+    <style>
+        body {
+            background-color: #808080;
+        }
+
+        #squatAssist {
+            font-size: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .lefted-container label[for="howToUse"] {
+            font-size: 10px;
+        }
+
+        .centered-container label[for="countdownInput"] {
+            font-size: 15px;
+        }
+
+        .lefted-container {
+            text-align: left;
+            margin: 20px 0;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .centered-container #canvas {
+            display: none;
+        }
+
+        .centered-container {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        #countdownDisplay {
+            font-size: 60px;
+        }
+
+
+        #count-container {
+            font-size: 40px;
+        }
+
+
+        #countdownInput {
+            font-size: 10px;
+            padding: 5px 10px;
+            background-color: white;
+            color: black;
+            border: default;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+
+        /* 초기화 버튼 스타일 */
+        #initButton {
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            /* 테두리 둥글게 */
+            cursor: pointer;
+        }
+
+        #initButton:hover {
+            background-color: #3c8e40;
+            /* 마우스 오버 시 배경 색상 변경 */
+        }
+
+        #startButton {
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            /* 테두리 둥글게 */
+            cursor: pointer;
+        }
+
+        #startButton:hover {
+            background-color: #3c8e40;
+            /* 마우스 오버 시 배경 색상 변경 */
+        }
+
+        #howToUseButton {
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            /* 테두리 둥글게 */
+            cursor: pointer;
+        }
+
+        #howToUseButton:hover {
+            background-color: #3c8e40;
+            /* 마우스 오버 시 배경 색상 변경 */
+        }
+
+        #goButton {
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #goButton:hover {
+            background-color: #3c8e40;
+        }
+
+        #stopButton {
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #FF431B;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #stopButton:hover {
+            background-color: #ee4019;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+
+    <div id="squatAssist">Squat Assist</div>
+
+    <div><canvas id="canvas"></canvas></div>
+
+    <!-- 카메라 숨기기
+    <div class="centered-container">
+        <canvas id="canvas"></canvas>
+    </div> -->
+
+    <div class="centered-container">
+        <div id="count-container"></div>
+    </div>
+
+    <div class="lefted-container">
+        <label for="howToUseStep1">
+            Test Text:<br>
+        </label>
+    </div>
+
+
+    <div class="centered-container" id="countdownDisplay"></div>
+
+
+    <div class="button-container">
+        <button type="button" id="startButton" onclick="startExercise()" style="display: none;">Start</button>
+        <button type="button" id="howToUseButton" onclick="howToUseStep1()" style="display: none;">How to Use</button>
+        <button type="button" id="goButton" onclick="go()" style="display: none;">Go</button>
+        <button type="button" id="stopButton" onclick="stop()" style="display: none;">Stop</button>
+    </div>
+
+    <!-- Countdown Section -->
+    <div class="centered-container" id="countdownSection" style="display:none;">
+        <label for="countdownInput">Countdown (seconds): </label>
+        <input type="number" id="countdownInput" value="5" min="1" max="60">
+    </div>
+
+    <!-- Countdown Section, initially hidden -->
+    <div class="centered-container" id="countdownInputSection" style="display:none;">
+        <label for="countdownInput">Countdown (seconds): </label>
+        <input type="number" id="countdownInput" value="5" min="1" max="60">
+        <button type="button" id="countdownStartButton">Countdown</button>
+    </div>
+    
+
+
+
+
+
+
+
+    <!-- //스타트버튼 그냥없애면 문제가 생길까?
+    <button type="button" onclick="init()">Start</button> -->
+
+
+    <div id="label-container"></div>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
+    <script type="text/javascript">
+        // More API functions here:
+        // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/pose
+
+        // the link to your model provided by Teachable Machine export panel
+        const URL = "./my-pose-model/";
+        let model, webcam, ctx, labelContainer, maxPredictions;
+        let posesInit = [false, false, false, false]; // 각 자세를 정확히 인식하는지를 표기
+        let ready = false; // 각 자세가 모두 인식되었을때 운동할 준비를 표기
+        let start = false;
+        let above90StartTimes = [0, 0, 0, 0]; // 각 자세별로 90% 이상 시작 시간 추적
+        let sitLeft = false;
+        let sitRight = false; // true가 될 시 오디오를 출력
+        let delayedUpdate = false;
+        let showPredictions = false;
+        var status = "none";
+        var count = 0;
+        var countdown;
+
+        // 0~1, 0일때 더 엄격함
+        var standSensitivity = 0.9;
+        var squatSensitivity = 0.9;
+        var sitLeftSensitivity = 0.9;
+        var sitRightSensitivity = 0.9;
+
+
+        async function init() {
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+
+            // load the model and metadata
+            // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+            // Note: the pose library adds a tmPose object to your window (window.tmPose)
+            model = await tmPose.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
+
+            // Convenience function to setup a webcam
+            const size = 200;
+            const flip = true; // whether to flip the webcam
+            webcam = new tmPose.Webcam(size, size, flip); // width, height, flip
+            await webcam.setup(); // request access to the webcam
+            await webcam.play();
+            window.requestAnimationFrame(loop);
+
+            // append/get elements to the DOM
+            const canvas = document.getElementById("canvas");
+            canvas.width = size; canvas.height = size;
+            ctx = canvas.getContext("2d");
+            labelContainer = document.getElementById("label-container");
+            for (let i = 0; i < maxPredictions; i++) { // and class labels
+                labelContainer.appendChild(document.createElement("div"));
+            }
+            // 자세 글자 크기
+            for (let i = 0; i < maxPredictions; i++) {
+                labelContainer.childNodes[i].style.fontSize = '30px'; 
+            }
+        }
+
+        async function loop(timestamp) {
+            webcam.update(); // update the webcam frame
+            await predict();
+            window.requestAnimationFrame(loop);
+        }
+
+        async function predict() {
+            // Prediction #1: run input through posenet
+            // estimatePose can take in an image, video or canvas html element
+            const { pose, posenetOutput } = await model.estimatePose(webcam.canvas);
+            // Prediction 2: run input through teachable machine classification model
+            const prediction = await model.predict(posenetOutput);
+
+            for (let i = 0; i < maxPredictions; i++) {
+                const classPrediction =
+                    prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+                labelContainer.childNodes[i].innerHTML = classPrediction;
+            }
+
+            // finally draw the poses
+            drawPose(pose);
+        }
+
+        function drawPose(pose) {
+            if (webcam.canvas) {
+                ctx.drawImage(webcam.canvas, 0, 0);
+                // draw the keypoints and skeleton
+                if (pose) {
+                    const minPartConfidence = 0.5;
+                    tmPose.drawKeypoints(pose.keypoints, minPartConfidence, ctx);
+                    tmPose.drawSkeleton(pose.keypoints, minPartConfidence, ctx);
+                }
+            }
+        }
+
+        window.onload = async () => {
+            await init();
+            // init 실행 후 버튼들을 표시
+            document.getElementById('startButton').style.display = 'inline-block';
+            document.getElementById('howToUseButton').style.display = 'inline-block';
+        };
+
+
+
+        function startExercise() {
+            console.log('Preparation started');
+            // Show countdown input section
+            document.getElementById('countdownInputSection').style.display = 'block';
+        }
+
+        document.getElementById('countdownStartButton').addEventListener('click', function () {
+            startCountdown();
+        });
+
+        function startCountdown() {
+            console.log('Countdown started');
+            // Hide countdown input section
+            document.getElementById('countdownInputSection').style.display = 'none';
+
+            let countdown = document.getElementById('countdownInput').value; // Get user-input countdown time
+
+            // Start countdown timer
+            let countdownTimer = countdown;
+            document.getElementById('countdownDisplay').style.display = 'block';
+            let countdownInterval = setInterval(function () {
+                countdownTimer--;
+                document.getElementById('countdownDisplay').innerHTML = `${countdownTimer}`;
+
+                if (countdownTimer <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdownDisplay').style.display = 'none';
+                    // Trigger any further actions after countdown ends
+                }
+            }, 1000);
+    };
+
+
+
+
+        // function startExercise() {
+        //     // 여기에 운동 시작 로직 구현
+        //     console.log('Exercise started');
+        //     document.getElementById('countdownSection').style.display = 'block';
+        //     countdown = document.getElementById('countdownInput').value; // 사용자가 입력한 카운트다운 시간을 가져옵니다.
+
+        //     // 카운트다운 타이머 시작
+        //     let countdownTimer = countdown; // 남은 시간을 추적할 변수
+
+        //     let countdownInterval = setInterval(function () {
+        //         countdownTimer--; // 남은 시간을 1초 감소
+        //         document.getElementById('countdownDisplay').innerHTML = `${countdownTimer}`; // 업데이트된 시간을 화면에 표시
+
+        //         if (countdownTimer <= 0) {
+        //             clearInterval(countdownInterval);
+        //             document.getElementById('countdownDisplay').style.display = 'none';
+        //             // 카운트다운이 끝나면 숫자를 숨깁니다.
+        //         }
+        //     }, 1000); // 1초마다 반복
+
+        
+
+        // function howToUseStep1() {
+        //     // 여기에 "How to Use" 내용을 동적으로 표시하는 로직 구현
+        //     console.log('Showing how to use');
+        // }
+
+    </script>
+
+
+</body>
+
+</html>
