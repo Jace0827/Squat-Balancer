@@ -170,21 +170,6 @@
 
 
     <div class="centered-container" id="countdownDisplay"></div>
-    <!-- 
-    <div id="twoDimensionalGraph"
-        style="position: relative; width: 200px; height: 200px; border: 2px solid #000; margin: 20px auto;">
-        <div id="graphPoint"
-            style="position: absolute; width: 10px; height: 10px; border-radius: 50%; background-color: red; left: 50%; top: 50%; transform: translate(-50%, -50%);">
-        </div>
-    </div> -->
-
-    <div id="twoDimensionalGraphContainer"
-        style="position: relative; width: 200px; height: 200px; margin: 20px auto; display: none;">
-        <img id="twoDimensionalGraph" src="graph-image.png" style="width: 200px; height: 200px;" />
-        <div id="graphPoint"
-            style="position: absolute; width: 10px; height: 10px; border-radius: 50%; background-color: red; left: 50%; top: 50%; transform: translate(-50%, -50%);">
-        </div>
-    </div>
 
 
     <!-- Countdown Section, initially hidden -->
@@ -200,13 +185,101 @@
         <button type="button" id="stopButton" onclick="stop()" style="display: none;">Stop</button>
     </div>
 
+    <!-- How to Use Step 1: Initialize Your Position -->
+    <div id="howToUseStep1Container" style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 1: Initialize Your Position</h2>
+        <img src="imgae/set-up-the-countdown.png" alt="Setup Example" style="width: 300px; margin-bottom: 20px;" />
+        <p>Enter the number of seconds you need to get ready and into position before starting the initialization
+            process.
+            This will start a countdown timer allowing you to prepare before the initialization of the four key postures
+            begins.</p>
+        <p>Example: If you need 30 seconds to prepare, enter "30" in the countdown box and press "Start". This process
+            will help in calibrating the system for accurate posture recognition.</p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep2()">Step 1/6</button>
+    </div>
 
 
+    <!-- How to Use Step 2: Squat Position Initialization -->
+    <div id="howToUseStep2Container" style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 2: Squat Position Initialization</h2>
+        <img src="imgae/squat-positioning.png" alt="Squat Position Initialization Example"
+            style="width: 300px; margin-bottom: 20px;" />
+        <p>For the first posture initialization, focus on the squat position. Ensure you are fully visible in the camera
+            frame. Adjust your position so that when you are at the lowest point of your squat, you fill the camera
+            frame as much as possible.</p>
+        <p>The graph will illustrate this by positioning the red dot at the bottom center when you're in the correct
+            squat position.
+        </p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep3()">Step 2/6</button>
+    </div>
+
+    <!-- How to Use Step 3: Standing Posture Initialization -->
+    <div id="howToUseStep3Container" style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 3: Standing Posture Initialization</h2>
+        <img src="imgae/standing-positioning.png" alt="Standing Position Initialization Example"
+            style="width: 300px; margin-bottom: 20px;" />
+        <p>For the standing posture initialization, ensure that only your lower body is visible in the camera frame.</p>
+        <p>The graph will show the red dot at the top center to indicate the standing posture initialization. </p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep4()">Step 3/6</button>
+    </div>
+
+    <!-- How to Use Step 4: Squat Left and Right Initialization -->
+    <div id="howToUseStep4Container" style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 4: Activation of the "Go" Button</h2>
+        <img src="imgae/squat-left-and-right.png" alt="Standing Position Initialization Example"
+            style="width: 300px; margin-bottom: 20px;" />
+        <p>With the initial posture initializations for squat, standing, and seated weight shifts to the left/right
+            completed, the "Go" button will now become active. This indicates that the system is calibrated and ready to
+            track your workout.</p>
+        <p>Pressing "Go" will commence the exercise session. Make sure you're positioned correctly in front of the
+            camera as you start.</p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep5()">Step 4/6</button>
+    </div>
+
+    <!-- How to Use Step 5: Starting the Exercise and Using the "Stop" Button -->
+    <div id="howToUseStep5Container" style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 5: Starting the Exercise and Using the "Stop" Button</h2>
+        <img src="imgae/go.png" alt="Standing Position Initialization Example"
+            style="width: 300px; margin-bottom: 20px;" />
+        <p>Upon pressing "Go", your exercise session starts. The system will count each squat as you perform it. When
+            you squat and then stand up, each successful movement will be counted.</p>
+        <p>If you perform a squat with a weight shift to the left or right, an audio alert will specify the direction
+            ("Left" or "Right") instead of incrementing the squat count. This helps you maintain the correct form and
+            balance during your workout.</p>
+        <p>The "Stop" button becomes active as soon as you press "Go". You can press "Stop" at any time to pause the
+            session or to end your workout. Upon pressing "Stop", the counting will pause, and you can either take a
+            break or conclude your exercise routine.</p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep6()">Step 5/6</button>
+    </div>
+
+    <!-- How to Use Step 6: Stopping and Resetting the Session -->
+    <div id="howToUseStep6Container" style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 6: Stopping and Resetting the Session</h2>
+        <img src="imgae/stop.png" alt="Standing Position Initialization Example"
+            style="width: 300px; margin-bottom: 20px;" />
+        <p>Pressing the "Stop" button will end your current session, resetting the exercise count and pausing any
+            ongoing activities. This allows you to take a break or conclude your workout as needed.</p>
+        <p>After stopping, you can choose to restart your workout by initiating the "Go" button again, which will be
+            reactivated, or you can go back to the first step to review the instructions or adjust your setup.</p>
+
+        <div class="centered-container" id="countdownInputSection" style="display:block;">
+            <label for="countdownInput">Countdown (seconds): </label>
+            <input type="number" id="countdownInput" value="5" min="1" max="60">
+        </div>
+
+        <div class="button-container">
+            <button type="button" id="startButton" onclick="startExercise()" style="display: inline-block;">Start</button>
+        </div>
+    </div>
 
 
-
-
-
+    <div id="twoDimensionalGraphContainer"
+        style="position: relative; width: 200px; height: 200px; margin: 20px auto; display: none;">
+        <img id="twoDimensionalGraph" src="imgae/graph-image.png" style="width: 200px; height: 200px;" />
+        <div id="graphPoint"
+            style="position: absolute; width: 10px; height: 10px; border-radius: 50%; background-color: red; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+        </div>
+    </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
@@ -341,6 +414,9 @@
         function startExercise() {
             console.log('Countdown started');
             document.getElementById('countdownInputSection').style.display = 'none';
+            document.getElementById('startButton').style.display = 'none';
+            document.getElementById('howToUseButton').style.display = 'none';
+            document.getElementById('howToUseStep6Container').style.display = 'none';
 
             // Get the user-input countdown time from countdownInput element in real-time.
             let countdown = parseInt(document.getElementById('countdownInput').value, 10); // 문자열을 숫자로 변환
@@ -440,11 +516,47 @@
             document.getElementById('graphPoint').style.top = `calc(50% + ${yPosition}px)`;
         }
 
+        //todo: modify image
+        function howToUseStep1() {
+
+            document.getElementById('howToUseStep1Container').style.display = 'block'; // Show instructions for Step 1
+            // Optionally hide other elements that are not relevant during this step
+            document.getElementById('countdownInputSection').style.display = 'none';
+            document.getElementById('startButton').style.display = 'none';
+            document.getElementById('howToUseButton').style.display = 'none';
+        }
+
+        function howToUseStep2() {
+            // Hide Step 1 instructions and show Step 2 instructions
+            document.getElementById('howToUseStep1Container').style.display = 'none';
+            document.getElementById('howToUseStep2Container').style.display = 'block';
+        }
+
+
+        function howToUseStep3() {
+            // Hide Step 2 instructions and show Step 3 instructions
+            document.getElementById('howToUseStep2Container').style.display = 'none';
+            document.getElementById('howToUseStep3Container').style.display = 'block';
+        }
+
+        function howToUseStep4() {
+            document.getElementById('howToUseStep3Container').style.display = 'none';
+            document.getElementById('howToUseStep4Container').style.display = 'block';
+        }
+
+        function howToUseStep5() {
+            document.getElementById('howToUseStep4Container').style.display = 'none';
+            document.getElementById('howToUseStep5Container').style.display = 'block';
+        }
+
+        function howToUseStep6() {
+            document.getElementById('howToUseStep5Container').style.display = 'none';
+            document.getElementById('howToUseStep6Container').style.display = 'block';
+        }
 
 
 
 
-        //todo: Implement how to use / step1: countdown /step2: squat / step3: stand / step4: left right / step 5: go / step6: stop
     </script>
 
 
