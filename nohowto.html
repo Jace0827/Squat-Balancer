@@ -305,6 +305,7 @@
 
             webcam.update(); // update the webcam frame
             const predictions = await predict(timestamp);
+            window.requestAnimationFrame(loop);
             if (!ready) {
                 if (!delayedUpdate) {
                     setTimeout(() => {
@@ -318,7 +319,7 @@
 
             }
 
-            window.requestAnimationFrame(loop);
+            
         }
 
 

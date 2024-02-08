@@ -67,7 +67,7 @@
         }
 
 
-        /* 초기화 버튼 스타일 */
+        /* Style for the initialize button */
         #initButton {
             font-size: 20px;
             padding: 10px 20px;
@@ -75,13 +75,13 @@
             color: white;
             border: none;
             border-radius: 5px;
-            /* 테두리 둥글게 */
+            /* Make border rounded */
             cursor: pointer;
         }
 
         #initButton:hover {
             background-color: #3c8e40;
-            /* 마우스 오버 시 배경 색상 변경 */
+            /* Change background color on mouse hover */
         }
 
         #startButton {
@@ -91,13 +91,11 @@
             color: white;
             border: none;
             border-radius: 5px;
-            /* 테두리 둥글게 */
             cursor: pointer;
         }
 
         #startButton:hover {
             background-color: #3c8e40;
-            /* 마우스 오버 시 배경 색상 변경 */
         }
 
         #howToUseButton {
@@ -107,13 +105,11 @@
             color: white;
             border: none;
             border-radius: 5px;
-            /* 테두리 둥글게 */
             cursor: pointer;
         }
 
         #howToUseButton:hover {
             background-color: #3c8e40;
-            /* 마우스 오버 시 배경 색상 변경 */
         }
 
         #goButton {
@@ -153,9 +149,13 @@
 
     <div id="squatAssist">Squat Assist</div>
 
-    <!-- Canvas initially hidden -->
-    <div class="centered-container" style="display: none;" id="canvasContainer">
+
+    <div class="centered-container">
         <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="centered-container">
+        <div id="count-container"></div>
     </div>
 
     <div class="centered-container">
@@ -172,6 +172,13 @@
     <div class="centered-container" id="countdownDisplay"></div>
 
 
+    <!-- Countdown Section, initially hidden -->
+    <div class="centered-container" id="countdownInputSection" style="display:block;">
+        <label for="countdownInput">Countdown (seconds): </label>
+        <input type="number" id="countdownInput" value="5" min="1" max="60">
+        <button type="button" id="countdownStartButton">Countdown</button>
+    </div>
+
     <div class="button-container">
         <button type="button" id="startButton" onclick="startExercise()" style="display: none;">Start</button>
         <button type="button" id="howToUseButton" onclick="howToUseStep1()" style="display: none;">How to Use</button>
@@ -179,14 +186,6 @@
         <button type="button" id="stopButton" onclick="stop()" style="display: none;">Stop</button>
     </div>
 
-    <!-- Countdown Section, initially hidden -->
-    <div class="centered-container" id="countdownInputSection" style="display:none;">
-        <label for="countdownInput">Countdown (seconds): </label>
-        <input type="number" id="countdownInput" value="5" min="1" max="60">
-        <button type="button" id="countdownStartButton">Countdown</button>
-    </div>
-
-    
 
 
 
@@ -194,9 +193,6 @@
 
 
 
-
-    <!-- //스타트버튼 그냥없애면 문제가 생길까?
-    <button type="button" onclick="init()">Start</button> -->
 
 
     <div id="label-container"></div>
@@ -211,19 +207,23 @@
         // the link to your model provided by Teachable Machine export panel
         const URL = "./my-pose-model/";
         let model, webcam, ctx, labelContainer, maxPredictions;
-        let posesInit = [false, false, false, false]; // 각 자세를 정확히 인식하는지를 표기
-        let ready = false; // 각 자세가 모두 인식되었을때 운동할 준비를 표기
+        // Mark whether each posture is accurately recognized
+        let posesInit = [false, false, false, false];
+        // Mark if ready to exercise once all postures are recognized
+        let ready = false;
         let start = false;
-        let above90StartTimes = [0, 0, 0, 0]; // 각 자세별로 90% 이상 시작 시간 추적
+        // Track the start time when each posture exceeds 90% recognition
+        let above90StartTimes = [0, 0, 0, 0];
+        // Output audio when true
         let sitLeft = false;
-        let sitRight = false; // true가 될 시 오디오를 출력
+        let sitRight = false;
         let delayedUpdate = false;
         let showPredictions = false;
         var status = "none";
         var count = 0;
         var countdown;
 
-        // 0~1, 0일때 더 엄격함
+        // 0~1, more strict when 0
         var standSensitivity = 0.9;
         var squatSensitivity = 0.9;
         var sitLeftSensitivity = 0.9;
@@ -252,19 +252,33 @@
             const canvas = document.getElementById("canvas");
             canvas.width = size; canvas.height = size;
             ctx = canvas.getContext("2d");
-            labelContainer = document.getElementById("label-container");
+            labelContainer = document.getElementById("count-container");
             for (let i = 0; i < maxPredictions; i++) { // and class labels
                 labelContainer.appendChild(document.createElement("div"));
                 labelContainer.childNodes[i].style.fontSize = '30px';
             }
-            
-            
+
+            // Essential to center the camera
+            document.getElementById('canvas').style.display = 'inline-block';
+
+
         }
 
         async function loop(timestamp) {
             webcam.update(); // update the webcam frame
-            await predict();
+            const predictions = await predict(timestamp);
             window.requestAnimationFrame(loop);
+            if (!ready) {
+                if (!delayedUpdate) {
+                    setTimeout(() => {
+                        updatePosesInit(predictions, timestamp);
+                        delayedUpdate = true;
+                    }, countdown * 1000);
+
+                } else {
+                    updatePosesInit(predictions, timestamp);
+                }
+            }
         }
 
         async function predict() {
@@ -298,27 +312,28 @@
 
         window.onload = async () => {
             await init();
-            // init 실행 후 버튼들을 표시
             document.getElementById('startButton').style.display = 'inline-block';
             document.getElementById('howToUseButton').style.display = 'inline-block';
         };
 
 
 
-        // startExercise 함수 내부에서는 countdownInputSection을 보이게만 합니다.
+        // todo: Hide motion parameters, graph motion parameters, implement initialization feature
+
+        // Inside the startExercise function, it only makes the countdownInputSection visible.
         function startExercise() {
             console.log('Preparation started');
             document.getElementById('countdownInputSection').style.display = 'block';
         }
 
-        // 이벤트 리스너 추가 부분에서 countdownStartButton 클릭 시 startCountdown 함수를 호출합니다.
+        // Adding an event listener for clicking the countdownStartButton to call the startCountdown function.
         document.getElementById('countdownStartButton').addEventListener('click', startCountdown);
 
         function startCountdown() {
             console.log('Countdown started');
             document.getElementById('countdownInputSection').style.display = 'none';
 
-            // countdownInput 요소에서 사용자가 입력한 값을 실시간으로 가져옵니다.
+            // Get the user-input countdown time from countdownInput element in real-time.
             let countdown = parseInt(document.getElementById('countdownInput').value, 10); // 문자열을 숫자로 변환
 
             let countdownTimer = countdown;
@@ -331,8 +346,8 @@
                 if (countdownTimer <= 0) {
                     clearInterval(countdownInterval);
                     document.getElementById('countdownDisplay').style.display = 'none';
-                    // 카운트다운이 끝나고 실행할 동작
-                    // 예: 모션 인식 시작
+                    // Actions to perform after countdown ends
+                    // For example: start motion detection
                 }
             }, 1000);
         }
@@ -345,6 +360,44 @@
             // You might need to call or trigger the function that handles motion detection here
         }
 
+        function updatePosesInit(predictions, timestamp, poseStep) {
+
+            let poseIndex = poseSequence[poseStep];
+
+            // If the probability of the current pose is greater than or equal to 90% and delayedUpdate is true
+            if (predictions[poseSequence[poseIndex]].probability >= 0.9 && delayedUpdate) {
+                if (above90StartTimes[poseIndex] === 0) {
+                    above90StartTimes[poseIndex] = timestamp;
+                } else if (timestamp - above90StartTimes[poseIndex] >= 3000) {// Time required to confirm the pose
+                    posesInit[poseIndex] = true;
+                    labelContainer.childNodes[poseIndex].style.fontWeight = 'bold';
+                    labelContainer.childNodes[poseIndex].style.color = "#2AB700";
+                }
+            } else {
+                above90StartTimes[i] = 0;
+            }
+
+            // for (let i = 0; i < maxPredictions; i++) {
+            //     if (predictions[i].probability >= 0.9 && delayedUpdate) {
+            //         if (above90StartTimes[i] === 0) {
+            //             above90StartTimes[i] = timestamp;
+            //         } else if (timestamp - above90StartTimes[i] >= 3000) {//포즈 확인에 필요한 시간
+            //             posesInit[i] = true;
+            //             labelContainer.childNodes[i].style.fontWeight = 'bold';
+            //             labelContainer.childNodes[i].style.color = "#2AB700";
+            //         }
+            //     } else {
+            //         above90StartTimes[i] = 0;
+            //     }
+            // }
+            if (posesInit.every(val => val === true) && !start) {
+                ready = true;  // Change the ready state to true
+                document.getElementById('goButton').style.display = 'inline-block';
+                // Additional logic as needed (e.g., play audio)
+            }
+        }
+
+        //todo: Implement how to use / step1: countdown /step2: squat / step3: stand / step4: left right / step 5: go / step6: stop
 
 
 
