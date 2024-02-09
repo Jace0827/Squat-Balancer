@@ -45,11 +45,9 @@
             font-size: 60px;
         }
 
-
         #count-container {
             font-size: 40px;
         }
-
 
         #countdownInput {
             font-size: 10px;
@@ -66,7 +64,6 @@
             margin: 20px 0;
         }
 
-
         /* Style for the initialize button */
         #initButton {
             font-size: 20px;
@@ -82,6 +79,10 @@
         #initButton:hover {
             background-color: #3c8e40;
             /* Change background color on mouse hover */
+        }
+
+        .custom-font-size-for-init {
+            font-size: 30px;
         }
 
         #startButton {
@@ -140,15 +141,10 @@
             background-color: #ee4019;
         }
     </style>
-
-
 </head>
 
 <body>
-
-
     <div id="squatAssist">Squat Assist</div>
-
 
     <div class="centered-container">
         <canvas id="canvas"></canvas>
@@ -162,20 +158,10 @@
         <div id="count-container"></div>
     </div>
 
-    <div class="lefted-container">
-        <label for="howToUseStep1">
-            Test Text:<br>
-        </label>
-    </div>
-
-
-    <div class="centered-container" id="countdownDisplay"></div>
-
-
     <!-- Countdown Section, initially hidden -->
     <div class="centered-container" id="countdownInputSection" style="display:block;">
         <label for="countdownInput">Countdown (seconds): </label>
-        <input type="number" id="countdownInput" value="5" min="1" max="60">
+        <input type="number" id="countdownInput" value="1" min="1" max="60">
     </div>
 
     <div class="button-container">
@@ -268,7 +254,8 @@
         </div>
 
         <div class="button-container">
-            <button type="button" id="startButton" onclick="startExercise()" style="display: inline-block;">Start</button>
+            <button type="button" id="startButton" onclick="startExercise()"
+                style="display: inline-block;">Start</button>
         </div>
     </div>
 
@@ -281,9 +268,33 @@
         </div>
     </div>
 
+    <div class="centered-container custom-font-size-for-init" id="squat" style="display:none;">
+        <p>Squat</p>
+    </div>
+
+    <div class="centered-container custom-font-size-for-init" id="stand" style="display:none;">
+        <p>Stand</p>
+    </div>
+
+    <div class="centered-container custom-font-size-for-init" id="squatLeft" style="display:none;">
+        <p>Squat Left</p>
+    </div>
+
+    <div class="centered-container custom-font-size-for-init" id="squatRight" style="display:none;">
+        <p>Squat Right</p>
+    </div>
+    <div class="centered-container custom-font-size-for-init" id="testText" style="display:none;">
+        <p>OKAY</p>
+    </div>
+
+    <div class="centered-container" id="countdownDisplay"></div>
+
+    <div id="countdownDisplay" style="display: none;">3</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
+    <script src="howToUse.js"></script>
+    <script src="initializePose.js"></script>
     <script type="text/javascript">
         // More API functions here:
         // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/pose
@@ -295,7 +306,7 @@
         let posesInit = [false, false, false, false];
         // Mark if ready to exercise once all postures are recognized
         let ready = false;
-        let start = false;
+        let started = false;
         // Track the start time when each posture exceeds 90% recognition
         let above90StartTimes = [0, 0, 0, 0];
         // Output audio when true
@@ -313,10 +324,15 @@
         var sitLeftSensitivity = 0.9;
         var sitRightSensitivity = 0.9;
 
+        const requiredProbability = 0.9;
+        const poseNames = ['squat', 'stand', 'squatLeft', 'squatRight'];
+        let poseIndex = 0;
 
         async function init() {
             const modelURL = URL + "model.json";
             const metadataURL = URL + "metadata.json";
+
+            countdown = document.getElementById('countdownInput').value;
 
             // load the model and metadata
             // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
@@ -341,27 +357,22 @@
                 labelContainer.appendChild(document.createElement("div"));
                 labelContainer.childNodes[i].style.fontSize = '30px';
             }
-
-            // Essential to center the camera
+            // center the camera
             document.getElementById('canvas').style.display = 'inline-block';
-
-
         }
 
         async function loop(timestamp) {
             webcam.update(); // update the webcam frame
-            const predictions = await predict(timestamp);
+            const prediction = await predict();
             window.requestAnimationFrame(loop);
-            if (!ready) {
-                if (!countdownDone) {
-                    setTimeout(() => {
-                        updatePosesInit(predictions, timestamp);
-                        countdownDone = true;
-                    }, countdown * 1000);
+            if (started) {
+                setTimeout(() => {
+                    updatePosesInit(prediction, timestamp);
+                    countdownDone = true;
+                }, countdown * 1000);
 
-                } else {
-                    updatePosesInit(predictions, timestamp);
-                }
+            } else {
+                updatePosesInit(prediction, timestamp);
             }
         }
 
@@ -376,7 +387,9 @@
                 document.getElementById('twoDimensionalGraphContainer').style.display = 'block';
                 updateTwoDimensionalGraph(prediction);
             }
-            // //pose weight visualization
+
+            //pose weight visualization, 
+            //Commenting Out
             // for (let i = 0; i < maxPredictions; i++) {
             //     const classPrediction =
             //         prediction[i].className + ": " + prediction[i].probability.toFixed(2);
@@ -385,6 +398,7 @@
 
             // finally draw the poses
             drawPose(pose);
+            return prediction;
 
         }
 
@@ -399,6 +413,15 @@
                 }
             }
         }
+        function updatePosesInit(prediction, timestamp) {
+            if (countdownDone) {
+                if (poseIndex < maxPredictions) {
+                    initializePoseByIndex(poseIndex, prediction, timestamp);
+                } else {
+                    document.getElementById('startButton').style.display = 'block';
+                }
+            }
+        }
 
         window.onload = async () => {
             await init();
@@ -406,12 +429,11 @@
             document.getElementById('howToUseButton').style.display = 'inline-block';
         };
 
-
-
-        // todo: implement initialization, go and stop feature
+        // todo: implement go and stop feature
 
         // Inside the startExercise function, it only makes the countdownInputSection visible.
         function startExercise() {
+            started = true;
             console.log('Countdown started');
             document.getElementById('countdownInputSection').style.display = 'none';
             document.getElementById('startButton').style.display = 'none';
@@ -446,7 +468,7 @@
             document.getElementById('countdownInputSection').style.display = 'none';
 
             // Get the user-input countdown time from countdownInput element in real-time.
-            let countdown = parseInt(document.getElementById('countdownInput').value, 10); // 문자열을 숫자로 변환
+            let countdown = parseInt(document.getElementById('countdownInput').value, 10);
 
             let countdownTimer = countdown;
             document.getElementById('countdownDisplay').style.display = 'block';
@@ -458,45 +480,17 @@
                 if (countdownTimer <= 0) {
                     clearInterval(countdownInterval);
                     document.getElementById('countdownDisplay').style.display = 'none';
-                    countdownDone = true; // Set countdownDone to true when countdown ends
-                    // Actions to perform after countdown ends
-                    // For example: start motion detection
+                    countdownDone = true; 
                 }
             }, 1000);
         }
 
 
-        function startMotionDetection() {
-            // Assuming `start` is used to control the motion detection start
-            start = true;
-            console.log('Motion detection started');
-            // You might need to call or trigger the function that handles motion detection here
-        }
-
-        function updatePosesInit(predictions, timestamp, poseStep) {
-
-            let poseIndex = poseSequence[poseStep];
-
-            // If the probability of the current pose is greater than or equal to 90% and countdownDone is true
-            if (predictions[poseSequence[poseIndex]].probability >= 0.9 && countdownDone) {
-                if (above90StartTimes[poseIndex] === 0) {
-                    above90StartTimes[poseIndex] = timestamp;
-                } else if (timestamp - above90StartTimes[poseIndex] >= 3000) {// Time required to confirm the pose
-                    posesInit[poseIndex] = true;
-                    labelContainer.childNodes[poseIndex].style.fontWeight = 'bold';
-                    labelContainer.childNodes[poseIndex].style.color = "#2AB700";
-                }
-            } else {
-                above90StartTimes[i] = 0;
-            }
-
-            if (posesInit.every(val => val === true) && !start) {
-                ready = true;  // Change the ready state to true
-                document.getElementById('goButton').style.display = 'inline-block';
-                // Additional logic as needed (e.g., play audio)
-            }
-        }
-
+        window.onload = async () => {
+            await init();
+            document.getElementById('startButton').style.display = 'inline-block';
+            document.getElementById('howToUseButton').style.display = 'inline-block';
+        };
 
 
         function updateTwoDimensionalGraph(prediction) {
@@ -510,53 +504,10 @@
             const yBasePosition = (prediction[0].probability - prediction[1].probability + prediction[3].probability + prediction[2].probability) * containerHeight / 2;
             const yPosition = Math.max(yBasePosition, -containerHeight / 2); // 최하단을 넘지 않도록 제한
 
-
             // Update the position of the point
             document.getElementById('graphPoint').style.left = `calc(50% + ${xPosition}px)`;
             document.getElementById('graphPoint').style.top = `calc(50% + ${yPosition}px)`;
         }
-
-        //todo: modify image
-        function howToUseStep1() {
-
-            document.getElementById('howToUseStep1Container').style.display = 'block'; // Show instructions for Step 1
-            // Optionally hide other elements that are not relevant during this step
-            document.getElementById('countdownInputSection').style.display = 'none';
-            document.getElementById('startButton').style.display = 'none';
-            document.getElementById('howToUseButton').style.display = 'none';
-        }
-
-        function howToUseStep2() {
-            // Hide Step 1 instructions and show Step 2 instructions
-            document.getElementById('howToUseStep1Container').style.display = 'none';
-            document.getElementById('howToUseStep2Container').style.display = 'block';
-        }
-
-
-        function howToUseStep3() {
-            // Hide Step 2 instructions and show Step 3 instructions
-            document.getElementById('howToUseStep2Container').style.display = 'none';
-            document.getElementById('howToUseStep3Container').style.display = 'block';
-        }
-
-        function howToUseStep4() {
-            document.getElementById('howToUseStep3Container').style.display = 'none';
-            document.getElementById('howToUseStep4Container').style.display = 'block';
-        }
-
-        function howToUseStep5() {
-            document.getElementById('howToUseStep4Container').style.display = 'none';
-            document.getElementById('howToUseStep5Container').style.display = 'block';
-        }
-
-        function howToUseStep6() {
-            document.getElementById('howToUseStep5Container').style.display = 'none';
-            document.getElementById('howToUseStep6Container').style.display = 'block';
-        }
-
-
-
-
     </script>
 
 
