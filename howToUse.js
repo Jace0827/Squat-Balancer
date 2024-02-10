@@ -35,3 +35,7 @@ function howToUseStep6() {
     document.getElementById('howToUseStep5Container').style.display = 'none';
     document.getElementById('howToUseStep6Container').style.display = 'block';
 }
+function howToUseStep7() {
+    document.getElementById('howToUseStep6Container').style.display = 'none';
+    document.getElementById('howToUseStep7Container').style.display = 'block';
+}

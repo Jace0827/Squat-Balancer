@@ -30,7 +30,7 @@ function initializePoseByIndex(poseIndex, prediction, timestamp) {
         } else if (timestamp - above90StartTimes[poseIndex] >= 3000) {
             posesInit[poseIndex] = true;
             document.getElementById(poseNames[poseIndex]).style.fontWeight = 'bold';
-            document.getElementById(poseNames[poseIndex]).style.color = "#2AB700";
+            document.getElementById(poseNames[poseIndex]).style.color = "#409426";
             updatePoseIndex();
             const initialized = setInterval(() => {                        
                 document.getElementById(poseNames[poseIndex]).style.display = 'none';

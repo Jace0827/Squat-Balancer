@@ -9,12 +9,28 @@
     <style>
         body {
             background-color: #808080;
+            background-image: url('image/background.png');
+            background-position: center top;
+            /* 이미지를 수평 중앙과 상단에 맞춤 */
         }
+
 
         #squatAssist {
             font-size: 30px;
             text-align: center;
             margin: 20px 0;
+        }
+
+        #countdownInputSection {
+            padding: 10px;
+            background-color: #f0f0f0;
+            /* 배경색 */
+            border-radius: 10px;
+            /* 모서리 둥글기 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* 그림자 효과 */
+            margin: 20px auto;
+            width: fit-content;
         }
 
         .lefted-container label[for="howToUse"] {
@@ -23,7 +39,15 @@
 
         .centered-container label[for="countdownInput"] {
             font-size: 15px;
+
         }
+
+        label[for="countdownInput"] {
+            font-size: 15px;
+            /* font-weight: bold; */
+            color: rgb(0, 0, 0);
+        }
+
 
         .lefted-container {
             text-align: left;
@@ -43,6 +67,8 @@
 
         #countdownDisplay {
             font-size: 60px;
+            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+            /* 하얀색 태두리 추가 */
         }
 
         #count-container {
@@ -83,11 +109,16 @@
 
         .custom-font-size-for-init {
             font-size: 30px;
+            font-weight: bold;
+            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+            /* 하얀색 태두리 추가 */
         }
 
         .custom-font-size-for-Reps {
             font-size: 30px;
             font-weight: bold;
+            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+            /* 하얀색 태두리 추가 */
         }
 
 
@@ -118,6 +149,33 @@
         #howToUseButton:hover {
             background-color: #3c8e40;
         }
+
+        .howToUseContainer {
+            background-color: #808080;
+            /* 회색 배경 */
+            padding: 20px;
+            /* 내용과 경계 사이의 공간 */
+            margin-bottom: 20px;
+            /* 섹션 사이의 공간 */
+            border-radius: 10px;
+            /* 모서리 둥글게 */
+        }
+
+        .howToUseContainer h2 {
+            font-size: 20px;
+            /* 제목 글자 크기 줄임 */
+        }
+
+        .howToUseContainer p {
+            font-size: 10px;
+            /* 본문 글자 크기 줄임 */
+        }
+
+        .howToUseContainer button {
+            font-size: 16px;
+            /* 버튼 글자 크기 */
+        }
+
 
         #goButton {
             font-size: 20px;
@@ -150,7 +208,7 @@
 </head>
 
 <body>
-    <div id="squatAssist">Squat Assist</div>
+    <div id="squatAssist"> </div>
 
     <div class="centered-container">
         <canvas id="canvas"></canvas>
@@ -172,7 +230,7 @@
 
     <div id="twoDimensionalGraphContainer"
         style="position: relative; width: 200px; height: 200px; margin: 20px auto; display: none;">
-        <img id="twoDimensionalGraph" src="imgae/graph-image.png" style="width: 200px; height: 200px;" />
+        <img id="twoDimensionalGraph" src="image/graph-image.png" style="width: 200px; height: 200px;" />
         <div id="graphPoint"
             style="position: absolute; width: 10px; height: 10px; border-radius: 50%; background-color: red; left: 50%; top: 50%; transform: translate(-50%, -50%);">
         </div>
@@ -186,81 +244,101 @@
     </div>
 
     <!-- How to Use Step 1: Initialize Your Position -->
-    <div id="howToUseStep1Container" style="display:none; text-align: center; margin-top: 20px;">
+    <div class="howToUseContainer" id="howToUseStep1Container"
+        style="display:none; text-align: center; margin-top: 20px;">
         <h2>Step 1: Initialize Your Position</h2>
-        <img src="imgae/set-up-the-countdown.png" alt="Setup Example" style="width: 300px; margin-bottom: 20px;" />
-        <p>Enter the number of seconds you need to get ready and into position before starting the initialization
-            process.
-            This will start a countdown timer allowing you to prepare before the initialization of the four key postures
-            begins.</p>
-        <p>Example: If you need 30 seconds to prepare, enter "30" in the countdown box and press "Start". This process
-            will help in calibrating the system for accurate posture recognition.</p>
-        <button type="button" id="howToUseButton" onclick="howToUseStep2()">Step 1/6</button>
+        <img src="image/set-up-the-countdown.png" alt="Setup Example" style="width: 150px; margin-bottom: 20px;" />
+        <p>The countdown gives you time to move into position for the exercise before starting the initialization
+            process. This allows you to get ready and prepare before the initialization of the four key postures begins.
+        </p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep2()">Step 1/7</button>
     </div>
 
 
     <!-- How to Use Step 2: Squat Position Initialization -->
-    <div id="howToUseStep2Container" style="display:none; text-align: center; margin-top: 20px;">
+    <div class="howToUseContainer" id="howToUseStep2Container"
+        style="display:none; text-align: center; margin-top: 20px;">
         <h2>Step 2: Squat Position Initialization</h2>
-        <img src="imgae/squat-positioning.png" alt="Squat Position Initialization Example"
-            style="width: 300px; margin-bottom: 20px;" />
-        <p>For the first posture initialization, focus on the squat position. Ensure you are fully visible in the camera
-            frame. Adjust your position so that when you are at the lowest point of your squat, you fill the camera
-            frame as much as possible.</p>
-        <p>The graph will illustrate this by positioning the red dot at the bottom center when you're in the correct
-            squat position.
-        </p>
-        <button type="button" id="howToUseButton" onclick="howToUseStep3()">Step 2/6</button>
+        <img src="image/squat-positioning.png" alt="Squat Position Initialization Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <img src="image/squat-graph.png" alt="Another Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <p>For the first posture initialization, focus on the squat position. It's important to ensure you are fully
+            visible within the camera frame. Adjust your position so that, at the lowest point of your squat, you fill
+            the camera frame as much as possible, similar to the example photo. The graph will reflect this adjustment
+            by positioning the red dot at the bottom center, indicating the correct squat position.</p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep3()">Step 2/7</button>
     </div>
 
-    <!-- How to Use Step 3: Standing Posture Initialization -->
-    <div id="howToUseStep3Container" style="display:none; text-align: center; margin-top: 20px;">
-        <h2>Step 3: Standing Posture Initialization</h2>
-        <img src="imgae/standing-positioning.png" alt="Standing Position Initialization Example"
-            style="width: 300px; margin-bottom: 20px;" />
+    <!-- How to Use Step 3: Position Initialized -->
+    <div class="howToUseContainer" id="howToUseStep3Container"
+        style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 3: Position Initialized</h2>
+        <img src="image/squat-graph.png" alt="Another Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <img src="image/squat-graph-initialized.png" alt="Another Example"
+            style="width: 69px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <p>Once you are properly positioned, mirroring the example, you will need to maintain that posture for 3
+            seconds. After this period, if the system successfully recognizes your posture, the text will turn green,
+            signaling that you are ready to proceed, and the countdown for the upcoming action will be displayed at the
+            bottom. If the system does not recognize your posture correctly, consider adjusting or moving the camera to
+            ensure you are fully visible and properly aligned within the frame. This adjustment will help the system
+            accurately detect your movements and posture.</p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep4()">Step 3/7</button>
+    </div>
+
+    <!-- How to Use Step 4: Standing Posture Initialization -->
+    <div class="howToUseContainer" id="howToUseStep4Container"
+        style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 4: Standing Posture Initialization</h2>
+        <img src="image/standing-positioning.png" alt="Squat Position Initialization Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <img src="image/standing-graph.png" alt="Another Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
         <p>For the standing posture initialization, ensure that only your lower body is visible in the camera frame.</p>
         <p>The graph will show the red dot at the top center to indicate the standing posture initialization. </p>
-        <button type="button" id="howToUseButton" onclick="howToUseStep4()">Step 3/6</button>
+        <button type="button" id="howToUseButton" onclick="howToUseStep5()">Step 4/7</button>
     </div>
 
-    <!-- How to Use Step 4: Squat Left and Right Initialization -->
-    <div id="howToUseStep4Container" style="display:none; text-align: center; margin-top: 20px;">
-        <h2>Step 4: Activation of the "Go" Button</h2>
-        <img src="imgae/squat-left-and-right.png" alt="Standing Position Initialization Example"
-            style="width: 300px; margin-bottom: 20px;" />
-        <p>With the initial posture initializations for squat, standing, and seated weight shifts to the left/right
-            completed, the "Go" button will now become active. This indicates that the system is calibrated and ready to
-            track your workout.</p>
-        <p>Pressing "Go" will commence the exercise session. Make sure you're positioned correctly in front of the
-            camera as you start.</p>
-        <button type="button" id="howToUseButton" onclick="howToUseStep5()">Step 4/6</button>
+    <!-- How to Use Step 5: Squat Left and Right Initialization -->
+    <div class="howToUseContainer" id="howToUseStep5Container"
+        style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 5: Activation of the "Go" Button</h2>
+        <img src="image/squat-left-graph.png" alt="Squat Position Initialization Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <img src="image/squat-right-graph.png" alt="Squat Position Initialization Example"
+            style="width: 68px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <p>Next, we will initialize postures with the weight centered to the left and right. This step is crucial for
+            the system to accurately detect and track any incorrect postures during the workout.</p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep6()">Step 5/7</button>
     </div>
 
-    <!-- How to Use Step 5: Starting the Exercise and Using the "Stop" Button -->
-    <div id="howToUseStep5Container" style="display:none; text-align: center; margin-top: 20px;">
-        <h2>Step 5: Starting the Exercise and Using the "Stop" Button</h2>
-        <img src="imgae/go.png" alt="Standing Position Initialization Example"
-            style="width: 300px; margin-bottom: 20px;" />
-        <p>Upon pressing "Go", your exercise session starts. The system will count each squat as you perform it. When
-            you squat and then stand up, each successful movement will be counted.</p>
-        <p>If you perform a squat with a weight shift to the left or right, an audio alert will specify the direction
-            ("Left" or "Right") instead of incrementing the squat count. This helps you maintain the correct form and
-            balance during your workout.</p>
-        <p>The "Stop" button becomes active as soon as you press "Go". You can press "Stop" at any time to pause the
-            session or to end your workout. Upon pressing "Stop", the counting will pause, and you can either take a
-            break or conclude your exercise routine.</p>
-        <button type="button" id="howToUseButton" onclick="howToUseStep6()">Step 5/6</button>
+    <!-- How to Use Step 6: Starting the Exercise and Using the "Stop" Button -->
+    <div class="howToUseContainer" id="howToUseStep6Container"
+        style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 6: Starting the Exercise</h2>
+        <img src="image/go-button-activated.png" alt="Another Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <p>Upon pressing "Go", your exercise session begins. The system will monitor each squat you perform, counting
+            and displaying the repetitions on the screen. As you execute a squat and then return to standing, each
+            movement will be tallied.</p>
+        <p>If your squat involves a weight shift to the left or right, the system will output an audio alert specifying
+            the direction ("Left" or "Right"), rather than adding to the squat count. This feature is designed to help
+            you maintain correct form and balance throughout your workout, ensuring that each movement is executed
+            properly.</p>
+        <button type="button" id="howToUseButton" onclick="howToUseStep7()">Step 6/7</button>
     </div>
 
-    <!-- How to Use Step 6: Stopping and Resetting the Session -->
-    <div id="howToUseStep6Container" style="display:none; text-align: center; margin-top: 20px;">
-        <h2>Step 6: Stopping and Resetting the Session</h2>
-        <img src="imgae/stop.png" alt="Standing Position Initialization Example"
-            style="width: 300px; margin-bottom: 20px;" />
+    <!-- How to Use Step 7: Stopping and Resetting the Session -->
+    <div class="howToUseContainer" id="howToUseStep7Container"
+        style="display:none; text-align: center; margin-top: 20px;">
+        <h2>Step 7: Stopping and Resetting the Session</h2>
+        <img src="image/stop-button-activated.png" alt="Another Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
         <p>Pressing the "Stop" button will end your current session, resetting the exercise count and pausing any
             ongoing activities. This allows you to take a break or conclude your workout as needed.</p>
         <p>After stopping, you can choose to restart your workout by initiating the "Go" button again, which will be
-            reactivated, or you can go back to the first step to review the instructions or adjust your setup.</p>
+            reactivated.</p>
 
         <div class="centered-container" id="countdownInputSection" style="display:block;">
             <label for="countdownInput">Countdown (seconds): </label>
@@ -315,7 +393,7 @@
         // the link to your model provided by Teachable Machine export panel
         const URL = "./my-pose-model/";
         let model, webcam, ctx, labelContainer, maxPredictions;
-        
+
         let exerciseStarted = false;
         let countdownDone = false;
         var countdown;
@@ -405,7 +483,7 @@
         function updatePosesInit(prediction, timestamp) {
             if (countdownDone) {
                 if (poseIndex < maxPredictions) {
-                // if (false) {
+                    // if (false) {
                     initializePoseByIndex(poseIndex, prediction, timestamp);
                 } else if (!exerciseStarted) {
                     document.getElementById('goButton').style.display = 'inline-block';

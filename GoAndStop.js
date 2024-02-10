@@ -36,10 +36,10 @@ function evaluatePose(prediction) {
             var audio = new Audio('voice/count_' + count + '.mp3');
         } else if (exerciseStatus === "sitLeft") {
             count++;
-            var audio = new Audio('voice/sit_left.mp3');
+            var audio = new Audio('voice/squat_left.mp3');
         } else if (exerciseStatus === "sitRight") {
             count++;
-            var audio = new Audio('voice/sit_right.mp3');
+            var audio = new Audio('voice/squat_right.mp3');
         }
         updateExerciseCount(count)
         audio.play();
