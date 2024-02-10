@@ -7,17 +7,41 @@ var standSensitivity = 0.9;
 var sitLeftSensitivity = 0.9;
 var sitRightSensitivity = 0.9;
 
-function go() {
-    exerciseStarted = true;
-    document.getElementById('goButton').style.display = 'none';
-    document.getElementById('stopButton').style.display = 'inline-block';
 
+let exerciseCountdownStart = false;
+let exerciseCountdownDone = false;
+var countdownTimerForGo;
+var countdownInterval;
+
+function go() {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+    exerciseCountdownStart = true;
+    exerciseCountdownDone = false;
+    countdownTimerForGo = 3; 
+    document.getElementById('goButton').style.display = 'none';
+    document.getElementById('countdownDisplayForGo').style.display = 'block';
+    document.getElementById('countdownDisplayForGo').innerHTML = countdownTimerForGo;
+
+    countdownInterval = setInterval(function () {
+        countdownTimerForGo--;
+        document.getElementById('countdownDisplayForGo').innerHTML = countdownTimerForGo;
+        
+        if (countdownTimerForGo <= 0) {
+            clearInterval(countdownInterval);
+            document.getElementById('countdownDisplayForGo').style.display = 'none';
+            document.getElementById('stopButton').style.display = 'inline-block';
+            exerciseCountdownDone = true;
+        }
+    }, 1000);
 }
 
+
 function stop() {
-    exerciseStarted = false;
+    exerciseCountdownStart = false;
     document.getElementById('stopButton').style.display = 'none';
-    document.getElementById('goButton').style.display = 'inline-block';
+    document.getElementById('exerciseCount').style.display = 'none';
     count = 0;
 }
 
@@ -36,10 +60,10 @@ function evaluatePose(prediction) {
             var audio = new Audio('voice/count_' + count + '.mp3');
         } else if (exerciseStatus === "sitLeft") {
             count++;
-            var audio = new Audio('voice/squat_left.mp3');
+            var audio = new Audio('voice/squatted_left.mp3');
         } else if (exerciseStatus === "sitRight") {
             count++;
-            var audio = new Audio('voice/squat_right.mp3');
+            var audio = new Audio('voice/squatted_right.mp3');
         }
         updateExerciseCount(count)
         audio.play();

@@ -71,6 +71,12 @@
             /* 하얀색 태두리 추가 */
         }
 
+        #countdownDisplayForGo {
+            font-size: 60px;
+            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+            /* 하얀색 태두리 추가 */
+        }
+
         #count-container {
             font-size: 40px;
         }
@@ -379,7 +385,7 @@
 
     <div class="centered-container" id="countdownDisplay"></div>
 
-    <div id="countdownDisplay" style="display: none;">3</div>
+    <div class="centered-container" id="countdownDisplayForGo"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
@@ -394,7 +400,7 @@
         const URL = "./my-pose-model/";
         let model, webcam, ctx, labelContainer, maxPredictions;
 
-        let exerciseStarted = false;
+        
         let countdownDone = false;
         var countdown;
 
@@ -438,7 +444,7 @@
             window.requestAnimationFrame(loop);
             updatePosesInit(prediction, timestamp);
 
-            if (exerciseStarted) {
+            if (exerciseCountdownStart && exerciseCountdownDone) {
                 evaluatePose(prediction);
             }
         }
@@ -483,9 +489,8 @@
         function updatePosesInit(prediction, timestamp) {
             if (countdownDone) {
                 if (poseIndex < maxPredictions) {
-                    // if (false) {
                     initializePoseByIndex(poseIndex, prediction, timestamp);
-                } else if (!exerciseStarted) {
+                } else if (!exerciseCountdownStart) {
                     document.getElementById('goButton').style.display = 'inline-block';
                 }
             }
@@ -519,9 +524,7 @@
                 if (countdownTimer <= 0) {
                     clearInterval(countdownInterval);
                     document.getElementById('countdownDisplay').style.display = 'none';
-                    countdownDone = true; // Set countdownDone to true when countdown ends
-                    // Actions to perform after countdown ends
-                    // For example: start motion detection
+                    countdownDone = true; 
                 }
             }, 1000);
         }
@@ -533,10 +536,7 @@
             console.log('Countdown started');
             document.getElementById('countdownInputSection').style.display = 'none';
 
-            // Get the user-input countdown time from countdownInput element in real-time.
-            let countdown = parseInt(document.getElementById('countdownInput').value, 10);
-
-            let countdownTimer = countdown;
+            let countdownTimer = parseInt(document.getElementById('countdownInput').value, 10);
             document.getElementById('countdownDisplay').style.display = 'block';
             document.getElementById('countdownDisplay').innerHTML = countdownTimer;
             let countdownInterval = setInterval(function () {
