@@ -1,8 +1,16 @@
+// Mark whether each posture is accurately recognized
+let posesInit = [false, false, false, false];
+// Track the start time when each posture exceeds 90% recognition
+let above90StartTimes = [0, 0, 0, 0];
+const requiredProbabilityForInit = 0.9;
+const poseNames = ['squat', 'stand', 'squatLeft', 'squatRight'];
+let poseIndex = 0;
+
 
 
 function initializePoseByIndex(poseIndex, prediction, timestamp) {
     document.getElementById(poseNames[poseIndex]).style.display = 'block';
-    if (prediction[poseIndex].probability.toFixed(2) >= 0.9 && countdownDone) {
+    if (prediction[poseIndex].probability.toFixed(2) >= requiredProbabilityForInit && countdownDone) {
         if (above90StartTimes[poseIndex] === 0) {
             above90StartTimes[poseIndex] = timestamp;
 

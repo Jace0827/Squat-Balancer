@@ -85,6 +85,12 @@
             font-size: 30px;
         }
 
+        .custom-font-size-for-Reps {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+
         #startButton {
             font-size: 20px;
             padding: 10px 20px;
@@ -161,7 +167,15 @@
     <!-- Countdown Section, initially hidden -->
     <div class="centered-container" id="countdownInputSection" style="display:block;">
         <label for="countdownInput">Countdown (seconds): </label>
-        <input type="number" id="countdownInput" value="1" min="1" max="60">
+        <input type="number" id="countdownInput" value="5" min="1" max="60">
+    </div>
+
+    <div id="twoDimensionalGraphContainer"
+        style="position: relative; width: 200px; height: 200px; margin: 20px auto; display: none;">
+        <img id="twoDimensionalGraph" src="imgae/graph-image.png" style="width: 200px; height: 200px;" />
+        <div id="graphPoint"
+            style="position: absolute; width: 10px; height: 10px; border-radius: 50%; background-color: red; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+        </div>
     </div>
 
     <div class="button-container">
@@ -260,13 +274,7 @@
     </div>
 
 
-    <div id="twoDimensionalGraphContainer"
-        style="position: relative; width: 200px; height: 200px; margin: 20px auto; display: none;">
-        <img id="twoDimensionalGraph" src="imgae/graph-image.png" style="width: 200px; height: 200px;" />
-        <div id="graphPoint"
-            style="position: absolute; width: 10px; height: 10px; border-radius: 50%; background-color: red; left: 50%; top: 50%; transform: translate(-50%, -50%);">
-        </div>
-    </div>
+
 
     <div class="centered-container custom-font-size-for-init" id="squat" style="display:none;">
         <p>Squat</p>
@@ -278,6 +286,10 @@
 
     <div class="centered-container custom-font-size-for-init" id="squatLeft" style="display:none;">
         <p>Squat Left</p>
+    </div>
+
+    <div class="centered-container custom-font-size-for-Reps" id="exerciseCount" style="display:none;">
+        <p>0 Reps</p>
     </div>
 
     <div class="centered-container custom-font-size-for-init" id="squatRight" style="display:none;">
@@ -293,8 +305,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
-    <script src="howToUse.js"></script>
-    <script src="initializePose.js"></script>
+    <script src="HowToUse.js"></script>
+    <script src="InitializePose.js"></script>
+    <script src="GoAndStop.js"></script>
     <script type="text/javascript">
         // More API functions here:
         // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/pose
@@ -302,31 +315,11 @@
         // the link to your model provided by Teachable Machine export panel
         const URL = "./my-pose-model/";
         let model, webcam, ctx, labelContainer, maxPredictions;
-        // Mark whether each posture is accurately recognized
-        let posesInit = [false, false, false, false];
-        // Mark if ready to exercise once all postures are recognized
-        let ready = false;
-        let started = false;
-        // Track the start time when each posture exceeds 90% recognition
-        let above90StartTimes = [0, 0, 0, 0];
-        // Output audio when true
-        let sitLeft = false;
-        let sitRight = false;
+        
+        let exerciseStarted = false;
         let countdownDone = false;
-        let showPredictions = false;
-        var status = "none";
-        var count = 0;
         var countdown;
 
-        // 0~1, more strict when 0
-        var standSensitivity = 0.9;
-        var squatSensitivity = 0.9;
-        var sitLeftSensitivity = 0.9;
-        var sitRightSensitivity = 0.9;
-
-        const requiredProbability = 0.9;
-        const poseNames = ['squat', 'stand', 'squatLeft', 'squatRight'];
-        let poseIndex = 0;
 
         async function init() {
             const modelURL = URL + "model.json";
@@ -365,14 +358,10 @@
             webcam.update(); // update the webcam frame
             const prediction = await predict();
             window.requestAnimationFrame(loop);
-            if (started) {
-                setTimeout(() => {
-                    updatePosesInit(prediction, timestamp);
-                    countdownDone = true;
-                }, countdown * 1000);
+            updatePosesInit(prediction, timestamp);
 
-            } else {
-                updatePosesInit(prediction, timestamp);
+            if (exerciseStarted) {
+                evaluatePose(prediction);
             }
         }
 
@@ -416,9 +405,10 @@
         function updatePosesInit(prediction, timestamp) {
             if (countdownDone) {
                 if (poseIndex < maxPredictions) {
+                // if (false) {
                     initializePoseByIndex(poseIndex, prediction, timestamp);
-                } else {
-                    document.getElementById('startButton').style.display = 'block';
+                } else if (!exerciseStarted) {
+                    document.getElementById('goButton').style.display = 'inline-block';
                 }
             }
         }
@@ -429,7 +419,6 @@
             document.getElementById('howToUseButton').style.display = 'inline-block';
         };
 
-        // todo: implement go and stop feature
 
         // Inside the startExercise function, it only makes the countdownInputSection visible.
         function startExercise() {
@@ -441,9 +430,8 @@
             document.getElementById('howToUseStep6Container').style.display = 'none';
 
             // Get the user-input countdown time from countdownInput element in real-time.
-            let countdown = parseInt(document.getElementById('countdownInput').value, 10); // 문자열을 숫자로 변환
 
-            let countdownTimer = countdown;
+            let countdownTimer = parseInt(document.getElementById('countdownInput').value, 10); // 문자열을 숫자로 변환
             document.getElementById('countdownDisplay').style.display = 'block';
             document.getElementById('countdownDisplay').innerHTML = countdownTimer;
             let countdownInterval = setInterval(function () {
@@ -480,18 +468,10 @@
                 if (countdownTimer <= 0) {
                     clearInterval(countdownInterval);
                     document.getElementById('countdownDisplay').style.display = 'none';
-                    countdownDone = true; 
+                    countdownDone = true;
                 }
             }, 1000);
         }
-
-
-        window.onload = async () => {
-            await init();
-            document.getElementById('startButton').style.display = 'inline-block';
-            document.getElementById('howToUseButton').style.display = 'inline-block';
-        };
-
 
         function updateTwoDimensionalGraph(prediction) {
             const containerWidth = 200; // Width of the 2D graph container
