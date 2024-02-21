@@ -267,6 +267,8 @@
         <h2>Step 2: Squat Position Initialization</h2>
         <img src="image/squat-positioning.png" alt="Squat Position Initialization Example"
             style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <img src="image/squat-positioning-portrait.png" alt="Squat Position Initialization Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
         <img src="image/squat-graph.png" alt="Another Example"
             style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
         <p>For the first posture initialization, focus on the squat position. It's important to ensure you are fully
@@ -298,6 +300,8 @@
         style="display:none; text-align: center; margin-top: 20px;">
         <h2>Step 4: Standing Posture Initialization</h2>
         <img src="image/standing-positioning.png" alt="Squat Position Initialization Example"
+            style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
+        <img src="image/standing-positioning-portrait.png" alt="Squat Position Initialization Example"
             style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
         <img src="image/standing-graph.png" alt="Another Example"
             style="width: 70px; margin-bottom: 20px; display: inline-block; vertical-align: top;">
@@ -400,7 +404,7 @@
         const URL = "./my-pose-model/";
         let model, webcam, ctx, labelContainer, maxPredictions;
 
-        
+
         let countdownDone = false;
         var countdown;
 
@@ -524,7 +528,7 @@
                 if (countdownTimer <= 0) {
                     clearInterval(countdownInterval);
                     document.getElementById('countdownDisplay').style.display = 'none';
-                    countdownDone = true; 
+                    countdownDone = true;
                 }
             }, 1000);
         }
