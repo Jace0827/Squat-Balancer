@@ -11,7 +11,7 @@
             background-color: #808080;
             background-image: url('image/background.png');
             background-position: center top;
-            /* 이미지를 수평 중앙과 상단에 맞춤 */
+            /* Align image to horizontal center and top */
         }
 
 
@@ -24,11 +24,9 @@
         #countdownInputSection {
             padding: 10px;
             background-color: #f0f0f0;
-            /* 배경색 */
             border-radius: 10px;
-            /* 모서리 둥글기 */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            /* 그림자 효과 */
+            /* Shadow effect */
             margin: 20px auto;
             width: fit-content;
         }
@@ -68,13 +66,12 @@
         #countdownDisplay {
             font-size: 60px;
             text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
-            /* 하얀색 태두리 추가 */
+            /* Add white border */
         }
 
         #countdownDisplayForGo {
             font-size: 60px;
             text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
-            /* 하얀색 태두리 추가 */
         }
 
         #count-container {
@@ -117,14 +114,12 @@
             font-size: 30px;
             font-weight: bold;
             text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
-            /* 하얀색 태두리 추가 */
         }
 
         .custom-font-size-for-Reps {
             font-size: 30px;
             font-weight: bold;
             text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
-            /* 하얀색 태두리 추가 */
         }
 
 
@@ -158,28 +153,25 @@
 
         .howToUseContainer {
             background-color: #808080;
-            /* 회색 배경 */
             padding: 20px;
-            /* 내용과 경계 사이의 공간 */
+            /* space between content and border */
             margin-bottom: 20px;
-            /* 섹션 사이의 공간 */
+            /* space between sections */
             border-radius: 10px;
-            /* 모서리 둥글게 */
         }
 
         .howToUseContainer h2 {
             font-size: 20px;
-            /* 제목 글자 크기 줄임 */
+            /* Reduce title font size */
         }
 
         .howToUseContainer p {
             font-size: 10px;
-            /* 본문 글자 크기 줄임 */
+            /* Reduce body font size */
         }
 
         .howToUseContainer button {
             font-size: 16px;
-            /* 버튼 글자 크기 */
         }
 
 
@@ -465,7 +457,7 @@
                 updateTwoDimensionalGraph(prediction);
             }
 
-            //pose weight visualization, 
+            /*pose weight visualization*/
             //Commenting Out
             // for (let i = 0; i < maxPredictions; i++) {
             //     const classPrediction =
@@ -518,7 +510,7 @@
 
             // Get the user-input countdown time from countdownInput element in real-time.
 
-            let countdownTimer = parseInt(document.getElementById('countdownInput').value, 10); // 문자열을 숫자로 변환
+            let countdownTimer = parseInt(document.getElementById('countdownInput').value, 10); // convert string to number
             document.getElementById('countdownDisplay').style.display = 'block';
             document.getElementById('countdownDisplay').innerHTML = countdownTimer;
             let countdownInterval = setInterval(function () {
@@ -564,7 +556,7 @@
 
             // Calculate the Y position based on the difference in probabilities between classes 0(squat) and 1(stand), and the activation of classes 2 or 3
             const yBasePosition = (prediction[0].probability - prediction[1].probability + prediction[3].probability + prediction[2].probability) * containerHeight / 2;
-            const yPosition = Math.max(yBasePosition, -containerHeight / 2); // 최하단을 넘지 않도록 제한
+            const yPosition = Math.max(yBasePosition, -containerHeight / 2); // Limited to not exceeding the bottom
 
             // Update the position of the point
             document.getElementById('graphPoint').style.left = `calc(50% + ${xPosition}px)`;

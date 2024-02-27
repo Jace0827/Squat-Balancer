@@ -47,8 +47,8 @@ function stop() {
 
 function updateExerciseCount(count) {
     var exerciseCountElement = document.getElementById('exerciseCount');
-    exerciseCountElement.innerHTML = `${count} Reps`; // innerText 대신 innerHTML 사용
-    exerciseCountElement.style.display = 'block'; // 요소를 화면에 보이게 함
+    exerciseCountElement.innerHTML = `${count} Reps`; // Use innerHTML instead of innerText
+    exerciseCountElement.style.display = 'block'; // Make an element visible on screen
 }
 function evaluatePose(prediction) {
     if (prediction[0].probability.toFixed(2) >= squatSensitivity
